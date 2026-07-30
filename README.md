@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Devtools Playground
 
-## Getting Started
+Regex, cron, JSON, Base64/URL, UUID/timestamp, JWT, diff ve hash için
+tek sayfalı, terminal temalı bir geliştirici araç kutusu. Var olan
+native Web/JS API'leri ve olgun kütüphaneleri ince bir katmanla
+birleştirir — tek gerçek bağımlılık [`diff`](https://www.npmjs.com/package/diff)
+(Myers diff algoritması için), geri kalanı `JSON`, `crypto`,
+`TextEncoder`/`TextDecoder`, `Intl` gibi platform API'leri.
 
-First, run the development server:
+Her araç sayfası, o an girdiğiniz veriye göre canlı güncellenen
+gerçek bir shell komutu gösterir (`grep`, `jq`, `base64`, `uuidgen`,
+`date`, `shasum`, `diff`) — arayüz, aracın arkasındaki gerçek
+Unix komutuna bilinçli olarak gönderme yapıyor.
+
+![Araç listesi](docs/screenshots/landing.png)
+![Regex testeri](docs/screenshots/regex.png)
+![Diff karşılaştırma](docs/screenshots/diff.png)
+
+## Araçlar
+
+| Komut | Sayfa | Ne yapar |
+| --- | --- | --- |
+| `grep` | `/regex` | Pattern'i canlı test et, eşleşmeleri ve grupları gör |
+| `crontab` | `/cron` | Cron ifadesini insan diline çevir, sonraki çalışma zamanlarını gör |
+| `jq` | `/json` | JSON'u formatla/minify et, syntax hatasının yerini bul |
+| `base64` | `/base64` | Metni Base64 veya URL-encode ile kodla/çöz |
+| `uuidgen` | `/id` | UUID v4 üret, Unix timestamp ↔ tarih çevir |
+| `jwt` | `/jwt` | Header ve payload'ı çöz (imza doğrulamadan) |
+| `diff` | `/diff` | İki metni kelime veya satır bazında karşılaştır |
+| `shasum` | `/hash` | Metinden SHA-1/256/384/512 hash üret |
+
+## Geliştirme
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3000
+npm test         # lib/ altındaki saf fonksiyon testleri
+npm run build    # prod build
+npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Her aracın mantığı `lib/*-utils.ts` içinde UI'dan bağımsız, saf
+fonksiyonlar olarak yaşıyor ve `lib/lib.test.ts`'de (framework'süz,
+Node'un native TypeScript desteğiyle) test ediliyor.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Next.js 16 (App Router) · Tailwind CSS v4 · TypeScript · `cron-parser`
+· `cronstrue` · `diff`
