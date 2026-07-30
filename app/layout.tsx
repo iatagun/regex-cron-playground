@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Regex & Cron Playground",
-  description: "Regex ve cron ifadelerini canlı test et.",
+  title: "Devtools Playground",
+  description: "Regex, cron, JSON, Base64, JWT ve daha fazlasını canlı test et.",
 };
 
 export default function RootLayout({
