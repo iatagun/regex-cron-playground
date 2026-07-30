@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { analyzeJson } from "@/lib/json-utils";
-import { ErrorBanner, Field, Panel, TextArea } from "@/components/ui";
+import { ErrorBanner, Field, Panel, PromptLine, TextArea } from "@/components/ui";
 
 export default function JsonPage() {
   const [input, setInput] = useState('{\n  "hello": "world",\n  "list": [1, 2, 3]\n}');
@@ -10,6 +10,8 @@ export default function JsonPage() {
 
   return (
     <div className="flex flex-col gap-6">
+      <PromptLine command="cat input.json | jq ." />
+
       <Field label="JSON girdisi">
         <TextArea value={input} onChange={(e) => setInput(e.target.value)} className="min-h-40" />
       </Field>
@@ -21,7 +23,7 @@ export default function JsonPage() {
           <Field label="Formatlanmış">
             <Panel mono>{result.formatted}</Panel>
           </Field>
-          <Field label="Minified">
+          <Field label="Minified — jq -c .">
             <Panel mono>{result.minified}</Panel>
           </Field>
         </>

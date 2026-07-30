@@ -2,7 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { computeHash, HASH_ALGORITHMS, type HashAlgorithm } from "@/lib/hash-utils";
-import { Field, Panel, TextArea } from "@/components/ui";
+import { Field, Panel, PromptLine, TextArea } from "@/components/ui";
+
+const SHASUM_FLAG: Record<HashAlgorithm, string> = {
+  "SHA-1": "1",
+  "SHA-256": "256",
+  "SHA-384": "384",
+  "SHA-512": "512",
+};
 
 export default function HashPage() {
   const [input, setInput] = useState("hello");
@@ -21,6 +28,8 @@ export default function HashPage() {
 
   return (
     <div className="flex flex-col gap-6">
+      <PromptLine command={`echo -n '${input}' | shasum -a ${SHASUM_FLAG[algorithm]}`} />
+
       <Field label="Metin">
         <TextArea value={input} onChange={(e) => setInput(e.target.value)} />
       </Field>
@@ -29,7 +38,7 @@ export default function HashPage() {
         <select
           value={algorithm}
           onChange={(e) => setAlgorithm(e.target.value as HashAlgorithm)}
-          className="w-fit rounded-lg border border-zinc-300 bg-white px-3 py-2 font-mono text-sm outline-none dark:border-zinc-700 dark:bg-zinc-900"
+          className="w-fit rounded-md border border-border bg-bg px-3 py-2 text-sm text-ink outline-none focus-visible:border-amber focus-visible:ring-2 focus-visible:ring-amber/40"
         >
           {HASH_ALGORITHMS.map((a) => (
             <option key={a} value={a}>

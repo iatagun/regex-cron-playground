@@ -1,36 +1,49 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { generateUuid, parseDateToTimestamp, parseTimestamp } from "@/lib/id-utils";
-import { Button, ErrorBanner, Field, Panel, TextInput } from "@/components/ui";
+import { Button, ErrorBanner, Field, Panel, PromptLine, TextInput } from "@/components/ui";
+
+// crypto.randomUUID() / Date.now() differ between server and client render,
+// so this seed is generated client-side only (post-hydration) to avoid a hydration mismatch.
+function seedNow() {
+  return {
+    uuid: generateUuid(),
+    timestampInput: String(Math.floor(Date.now() / 1000)),
+    dateInput: new Date().toISOString(),
+  };
+}
 
 export default function IdPage() {
-  const [uuid, setUuid] = useState(() => generateUuid());
-  const [timestampInput, setTimestampInput] = useState(() =>
-    String(Math.floor(Date.now() / 1000))
-  );
-  const [dateInput, setDateInput] = useState(() => new Date().toISOString());
+  const [seed, setSeed] = useState<ReturnType<typeof seedNow> | null>(null);
+  const [uuidOverride, setUuidOverride] = useState<string | null>(null);
+  const [timestampInput, setTimestampInput] = useState<string | null>(null);
+  const [dateInput, setDateInput] = useState<string | null>(null);
 
-  const timestampResult = parseTimestamp(timestampInput);
-  const dateResult = parseDateToTimestamp(dateInput);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time client-only seed, values are non-deterministic (random/current time)
+    setSeed(seedNow());
+  }, []);
+
+  const uuid = uuidOverride ?? seed?.uuid ?? null;
+  const timestamp = timestampInput ?? seed?.timestampInput ?? null;
+  const date = dateInput ?? seed?.dateInput ?? null;
+
+  const timestampResult = parseTimestamp(timestamp ?? "");
+  const dateResult = parseDateToTimestamp(date ?? "");
 
   return (
     <div className="flex flex-col gap-10">
       <div className="flex flex-col gap-3">
-        <h2 className="text-sm font-medium text-zinc-600 dark:text-zinc-400">UUID v4</h2>
-        <Panel mono>{uuid}</Panel>
-        <Button onClick={() => setUuid(generateUuid())}>Yeni UUID üret</Button>
+        <PromptLine command="uuidgen" />
+        <Panel mono>{uuid ?? "…"}</Panel>
+        <Button onClick={() => setUuidOverride(generateUuid())}>Yeni UUID üret</Button>
       </div>
 
       <div className="flex flex-col gap-3">
-        <h2 className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
-          Timestamp → Tarih
-        </h2>
+        <PromptLine command={`date -d @${timestamp || "0"} --iso-8601=seconds`} />
         <Field label="Unix timestamp (saniye veya milisaniye)">
-          <TextInput
-            value={timestampInput}
-            onChange={(e) => setTimestampInput(e.target.value)}
-          />
+          <TextInput value={timestamp ?? ""} onChange={(e) => setTimestampInput(e.target.value)} />
         </Field>
         {timestampResult.valid ? (
           <Panel mono>
@@ -44,11 +57,9 @@ export default function IdPage() {
       </div>
 
       <div className="flex flex-col gap-3">
-        <h2 className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
-          Tarih → Timestamp
-        </h2>
+        <PromptLine command={`date -d '${date ?? ""}' +%s`} />
         <Field label="Tarih (ISO 8601)">
-          <TextInput value={dateInput} onChange={(e) => setDateInput(e.target.value)} />
+          <TextInput value={date ?? ""} onChange={(e) => setDateInput(e.target.value)} />
         </Field>
         {dateResult.valid ? (
           <Panel mono>

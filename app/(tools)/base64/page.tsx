@@ -7,7 +7,7 @@ import {
   encodeBase64,
   encodeUrlComponent,
 } from "@/lib/base64-utils";
-import { ErrorBanner, Field, Panel, TextArea } from "@/components/ui";
+import { ErrorBanner, Field, Panel, PromptLine, TextArea } from "@/components/ui";
 
 type Mode = "base64" | "url";
 
@@ -24,17 +24,22 @@ export default function Base64Page() {
     [mode, input]
   );
 
+  const command =
+    mode === "base64"
+      ? `echo -n '${input}' | base64`
+      : `jq -rn --arg s '${input}' '$s|@uri'`;
+
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex gap-1 rounded-lg bg-zinc-200 p-1 dark:bg-zinc-800 w-fit">
+      <PromptLine command={command} />
+
+      <div className="flex w-fit overflow-hidden rounded-md border border-border">
         {(["base64", "url"] as const).map((m) => (
           <button
             key={m}
             onClick={() => setMode(m)}
-            className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-              mode === m
-                ? "bg-white text-zinc-900 shadow dark:bg-zinc-950 dark:text-zinc-50"
-                : "text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+            className={`px-3 py-1.5 font-display text-xs font-bold uppercase tracking-wide transition-colors ${
+              mode === m ? "bg-amber text-bg" : "text-muted hover:text-ink"
             }`}
           >
             {m === "base64" ? "Base64" : "URL"}

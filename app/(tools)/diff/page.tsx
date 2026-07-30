@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { computeDiff, type DiffMode } from "@/lib/diff-utils";
-import { Field, Panel, TextArea } from "@/components/ui";
+import { Field, Panel, PromptLine, TextArea } from "@/components/ui";
 
 export default function DiffPage() {
   const [mode, setMode] = useState<DiffMode>("words");
@@ -13,15 +13,15 @@ export default function DiffPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex gap-1 rounded-lg bg-zinc-200 p-1 dark:bg-zinc-800 w-fit">
+      <PromptLine command='diff <(echo "$A") <(echo "$B")' />
+
+      <div className="flex w-fit overflow-hidden rounded-md border border-border">
         {(["words", "lines"] as const).map((m) => (
           <button
             key={m}
             onClick={() => setMode(m)}
-            className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-              mode === m
-                ? "bg-white text-zinc-900 shadow dark:bg-zinc-950 dark:text-zinc-50"
-                : "text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+            className={`px-3 py-1.5 font-display text-xs font-bold uppercase tracking-wide transition-colors ${
+              mode === m ? "bg-amber text-bg" : "text-muted hover:text-ink"
             }`}
           >
             {m === "words" ? "Kelime" : "Satır"}
@@ -41,17 +41,14 @@ export default function DiffPage() {
           {parts.map((p, i) => {
             if (p.added) {
               return (
-                <mark key={i} className="rounded bg-green-200 px-0.5 dark:bg-green-500/40">
+                <mark key={i} className="rounded bg-green/20 px-0.5 text-green">
                   {p.value}
                 </mark>
               );
             }
             if (p.removed) {
               return (
-                <mark
-                  key={i}
-                  className="rounded bg-red-200 px-0.5 line-through dark:bg-red-500/40"
-                >
+                <mark key={i} className="rounded bg-red/20 px-0.5 text-red line-through">
                   {p.value}
                 </mark>
               );
